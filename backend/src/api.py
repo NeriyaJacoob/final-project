@@ -8,6 +8,10 @@ from contextlib import redirect_stdout
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 TMP_DIR = os.path.join(BASE_DIR, "..", "tmp")
+SUMMARY_DIR = os.path.join(BASE_DIR, "modules", "summary")
+STATS_PATH = os.path.join(SUMMARY_DIR, "stats.json")
+LOG_PATH = os.path.join(SUMMARY_DIR, "log.txt")
+PROGRESS_PATH = os.path.join(SUMMARY_DIR, "progress.json")
 
 sys.path.append(BASE_DIR)
 from modules.decrypt import decrypt_files
@@ -32,7 +36,7 @@ def update_quiz_score():
     score = data.get("score")
     total = data.get("total")
 
-    path = os.path.join("modules", "summary", "stats.json")
+    path = STATS_PATH
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             stats = json.load(f)
@@ -128,7 +132,7 @@ def list_target_files():
             rel = os.path.relpath(os.path.join(root, name), TARGET_BASE)
             files.append("/target/" + rel.replace(os.path.sep, "/"))
 
-    files.extend(["/tmp/block_ransom", "/tmp/detection_result.txt"])
+    files.append("/tmp/detection_result.txt")
 
     return jsonify({"files": files})
 
@@ -156,7 +160,7 @@ def update_theory_progress():
     data = request.get_json()
     page = str(data.get("page"))
 
-    path = os.path.join("modules", "summary", "progress.json")
+    path = PROGRESS_PATH
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             progress = json.load(f)
@@ -181,9 +185,9 @@ def generate_key():
 
 @app.route("/summary/logs", methods=["GET"])
 def get_logs():
-    log_path = os.path.join("modules", "summary", "log.txt")
-    progress_path = os.path.join("modules", "summary", "progress.json")
-    stats_path = os.path.join("modules", "summary", "stats.json")
+    log_path = LOG_PATH
+    progress_path = PROGRESS_PATH
+    stats_path = STATS_PATH
 
     # טען לוגים
     if os.path.exists(log_path):
@@ -358,7 +362,7 @@ def save_antivirus():
 
 @app.route("/summary/clear", methods=["POST"])
 def clear_summary_logs():
-    path = os.path.join("modules", "summary", "log.txt")
+    path = LOG_PATH
     try:
         open(path, "w").close()
         return jsonify({"status": "ok"})

@@ -58,3 +58,7 @@ Use `modules.tools.kill_process(pid)` in your antivirus script to terminate
 malicious simulations. The function also writes the `/tmp/block_ransom` flag so
 the backend recognizes that the process was blocked.
 
+Simulation and antivirus logs are stored in `backend/src/modules/summary/log.txt`.
+Look for lines beginning with `[RESULT]` to see whether each scenario was
+detected and blocked successfully.
+
