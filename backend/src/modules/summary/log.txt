@@ -1,0 +1,7 @@
+[SYSTEM] ⚠️ [INFO] אנטי־וירוס הופעל ע"י המשתמש
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[SYSTEM] ⚠️ התחלת סימולציה חדשה
+[SUCCESS] 🟢 [OK] זיהוי הצליח בסימולציית infection
+[FAIL] 🔴 הכופר הצפין את הקבצים בתיקייה
+[FAIL] 🔴 [RESULT] סימולציית infection זוהתה אך לא נחסמה
