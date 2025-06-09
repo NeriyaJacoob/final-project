@@ -1,0 +1,7 @@
+.marginBottom20 { margin-bottom: 20px; }
+.buttonsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}

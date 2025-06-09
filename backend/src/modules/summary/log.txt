@@ -1,0 +1,8 @@
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[SUCCESS] 🟢 [OK] זיהוי הצליח בסימולציית infection
+[SUCCESS] 🟢 [RESULT] סימולציית infection הצליחה (זוהה ונחסם)
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[FAIL] 🔴 [FAIL] לא זוהתה הדבקה בזמן בסימולציית infection
+[FAIL] 🔴 [RESULT] סימולציית infection לא זוהתה
