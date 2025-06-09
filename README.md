@@ -4,6 +4,12 @@ Run `./setup_env.sh` after cloning to install all dependencies.
 
 This repository contains a Flask backend and a React frontend.
 
+**Platform note:** The project targets Linux/Unix systems. Paths in the
+code use the operating system's temporary directory and the `start.sh` script
+invokes `gnome-terminal`, so running directly on Windows is not supported
+without modifications. Using WSL or a virtual machine is recommended for the
+best experience and to keep the malware simulation isolated.
+
 ## Prerequisites
 Alternatively run `./setup_env.sh` to install everything automatically.
 
@@ -39,6 +45,9 @@ Alternatively run `./setup_env.sh` to install everything automatically.
    ```
 
 ## Running
+The optional `start.sh` script opens two terminals with the backend and
+frontend. It requires `gnome-terminal` and therefore only works on Linux.
+If it doesn't run on your system, start the services manually:
 1. Start the Flask backend (from the repository root):
    ```bash
    source venv/bin/activate
@@ -57,4 +66,8 @@ files for the infection scenario reside under `backend/tmp/TestInfected`.
 Use `modules.tools.kill_process(pid)` in your antivirus script to terminate
 malicious simulations. The function also writes the `/tmp/block_ransom` flag so
 the backend recognizes that the process was blocked.
+
+Simulation and antivirus logs are stored in `backend/src/modules/summary/log.txt`.
+Look for lines beginning with `[RESULT]` to see whether each scenario was
+detected and blocked successfully.
 

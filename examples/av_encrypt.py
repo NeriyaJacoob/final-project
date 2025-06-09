@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend", "src")))
 
-DETECTION_FILE = "/tmp/detection_result.txt"
+from modules.constants import DETECTION_FILE
 from modules.tools import kill_process
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend", "target"))
 SIGNATURE = b"BME1"

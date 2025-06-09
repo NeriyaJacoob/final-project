@@ -8,6 +8,10 @@ from contextlib import redirect_stdout
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 TMP_DIR = os.path.join(BASE_DIR, "..", "tmp")
+SUMMARY_DIR = os.path.join(BASE_DIR, "modules", "summary")
+STATS_PATH = os.path.join(SUMMARY_DIR, "stats.json")
+LOG_PATH = os.path.join(SUMMARY_DIR, "log.txt")
+PROGRESS_PATH = os.path.join(SUMMARY_DIR, "progress.json")
 
 sys.path.append(BASE_DIR)
 from modules.decrypt import decrypt_files
@@ -32,7 +36,7 @@ def update_quiz_score():
     score = data.get("score")
     total = data.get("total")
 
-    path = os.path.join("modules", "summary", "stats.json")
+    path = STATS_PATH
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             stats = json.load(f)
@@ -46,12 +50,6 @@ def update_quiz_score():
 
     return jsonify({ "status": "ok" })
 
-from flask import request, jsonify
-import os
-
-from flask import Blueprint
-
-file_api = Blueprint("file_api", __name__)
 TMP_BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
 TARGET_BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "target"))
 
@@ -64,18 +62,21 @@ ALIAS_DIRS = {
 @app.route("/api/file", methods=["GET"])
 def read_file():
     path = request.args.get("path", "")
-    
-    base_dir = None
-    relative = None
-    for prefix, real_base in ALIAS_DIRS.items():
-        if path.startswith(prefix):
-            base_dir = real_base
-            relative = path[len(prefix):]
-            break
-    if base_dir is None:
-        return jsonify({"error": "Invalid path"}), 400
 
-    real_path = os.path.join(base_dir, relative)
+    if path == "/tmp/detection_result.txt":
+        real_path = DETECTION_FILE
+    else:
+        base_dir = None
+        relative = None
+        for prefix, real_base in ALIAS_DIRS.items():
+            if path.startswith(prefix):
+                base_dir = real_base
+                relative = path[len(prefix):]
+                break
+        if base_dir is None:
+            return jsonify({"error": "Invalid path"}), 400
+
+        real_path = os.path.join(base_dir, relative)
 
     try:
         with open(real_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -86,26 +87,29 @@ def read_file():
 
 
 # שמירת קובץ
-@file_api.route("/api/file", methods=["POST"])
+@app.route("/api/file", methods=["POST"])
 def save_file():
     data = request.get_json()
     path = data.get("path", "")
     content = data.get("content", "")
 
-    base_dir = None
-    relative = None
-    for prefix, real_base in ALIAS_DIRS.items():
-        if path.startswith(prefix):
-            base_dir = real_base
-            relative = path[len(prefix):]
-            break
-    if base_dir is None:
-        return jsonify({"error": "Invalid path"}), 400
+    if path == "/tmp/detection_result.txt":
+        real_path = DETECTION_FILE
+    else:
+        base_dir = None
+        relative = None
+        for prefix, real_base in ALIAS_DIRS.items():
+            if path.startswith(prefix):
+                base_dir = real_base
+                relative = path[len(prefix):]
+                break
+        if base_dir is None:
+            return jsonify({"error": "Invalid path"}), 400
 
-    path = os.path.join(base_dir, relative)
+        real_path = os.path.join(base_dir, relative)
 
     try:
-        with open(path, "w", encoding="utf-8") as f:
+        with open(real_path, "w", encoding="utf-8") as f:
             f.write(content)
         return jsonify({"status": "success"})
     except Exception as e:
@@ -128,7 +132,7 @@ def list_target_files():
             rel = os.path.relpath(os.path.join(root, name), TARGET_BASE)
             files.append("/target/" + rel.replace(os.path.sep, "/"))
 
-    files.extend(["/tmp/block_ransom", "/tmp/detection_result.txt"])
+    files.append("/tmp/detection_result.txt")
 
     return jsonify({"files": files})
 
@@ -156,7 +160,7 @@ def update_theory_progress():
     data = request.get_json()
     page = str(data.get("page"))
 
-    path = os.path.join("modules", "summary", "progress.json")
+    path = PROGRESS_PATH
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             progress = json.load(f)
@@ -181,9 +185,9 @@ def generate_key():
 
 @app.route("/summary/logs", methods=["GET"])
 def get_logs():
-    log_path = os.path.join("modules", "summary", "log.txt")
-    progress_path = os.path.join("modules", "summary", "progress.json")
-    stats_path = os.path.join("modules", "summary", "stats.json")
+    log_path = LOG_PATH
+    progress_path = PROGRESS_PATH
+    stats_path = STATS_PATH
 
     # טען לוגים
     if os.path.exists(log_path):
@@ -358,7 +362,7 @@ def save_antivirus():
 
 @app.route("/summary/clear", methods=["POST"])
 def clear_summary_logs():
-    path = os.path.join("modules", "summary", "log.txt")
+    path = LOG_PATH
     try:
         open(path, "w").close()
         return jsonify({"status": "ok"})
