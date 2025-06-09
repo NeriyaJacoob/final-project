@@ -49,13 +49,6 @@ def _run_student_antivirus_once():
             check=False,
         )
 
-def _read_counter():
-    try:
-        with open(COUNTER_FILE, "r") as f:
-            return int(f.read().strip())
-    except:
-        return 0
-
 def run_simulation(task: str):
     for path in [DETECTION_FILE, BLOCK_FLAG, COUNTER_FILE]:
         try:
@@ -111,7 +104,14 @@ def run_simulation(task: str):
         logs.append({"time": time_now(), "msg": "לא זוהה התהליך החשוד"})
 
     blocked = False
-    counter = _read_counter()
+    blocked_by_timeout = ret == -9  # SIGKILL או ערך המציין הריגה ע"י אנטי וירוס
+
+    try:
+        with open(COUNTER_FILE, "r") as f:
+            counter = int(f.read().strip())
+    except:
+        counter = 0
+
     if detected:
         if counter == 0:
             blocked = True
