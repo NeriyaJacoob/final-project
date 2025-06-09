@@ -97,7 +97,10 @@ def run_simulation(task: str):
             stdout, stderr = proc.communicate()
             ret = proc.returncode
 
-    detected = os.path.exists(DETECTION_FILE) and os.path.getsize(DETECTION_FILE) > 0
+    # Detection is considered successful if the detection file exists.
+    # Its contents are irrelevant, allowing antiviruses to simply
+    # create the file without writing any data.
+    detected = os.path.exists(DETECTION_FILE)
     if detected:
         logs.append({"time": time_now(), "msg": "אנטי וירוס זיהה תהליך חשוד"})
     else:

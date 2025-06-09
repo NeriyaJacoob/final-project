@@ -18,3 +18,13 @@ def test_generate_key():
     assert isinstance(key, str)
     assert len(key) == 64
     assert all(c in '0123456789abcdef' for c in key.lower())
+
+
+def test_list_target_files():
+    client = app.test_client()
+    resp = client.get('/api/target-files')
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert 'files' in data
+    assert isinstance(data['files'], list)
+    assert len(data['files']) > 0

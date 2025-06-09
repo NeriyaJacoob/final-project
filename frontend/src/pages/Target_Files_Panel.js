@@ -4,30 +4,29 @@ import axios from 'axios';
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://127.0.0.1:5000";
 
-const FILES = [
-  { path: "/tmp/TestInfected/hello.py", label: "hello.py" },
-  { path: "/tmp/TestInfected/test.sh", label: "test.sh" },
-  { path: "/tmp/block_ransom", label: "block_ransom" },
-  { path: "/tmp/detection_result.txt", label: "detection_result.txt" },
-];
-
 export default function FilePanel() {
+  const [files, setFiles] = useState([]);
   const [fileContents, setFileContents] = useState({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    FILES.forEach(file => {
-      axios.get(`${API_BASE}/api/file?path=${encodeURIComponent(file.path)}`)
-        .then(res => {
-          setFileContents(prev => ({ ...prev, [file.path]: res.data.content || "" }));
-        })
-        .catch(() => {
-          setFileContents(prev => ({ ...prev, [file.path]: "// ⚠️ קובץ לא נמצא או שגיאה בגישה" }));
-        });
+    axios.get(`${API_BASE}/api/target-files`).then(res => {
+      const fetched = res.data.files || [];
+      setFiles(fetched.map(p => ({ path: p, label: p.split('/').pop() })));
+      fetched.forEach(p => {
+        axios
+          .get(`${API_BASE}/api/file?path=${encodeURIComponent(p)}`)
+          .then(r => {
+            setFileContents(prev => ({ ...prev, [p]: r.data.content || "" }));
+          })
+          .catch(() => {
+            setFileContents(prev => ({ ...prev, [p]: "// ⚠️ קובץ לא נמצא או שגיאה בגישה" }));
+          });
+      });
     });
   }, []);
 
-  const handleSave = async (path) => {
+  const handleSave = async path => {
     setSaving(true);
     try {
       await axios.post(`${API_BASE}/api/file`, { path, content: fileContents[path] });
@@ -39,7 +38,7 @@ export default function FilePanel() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6">
-      {FILES.map(file => (
+      {files.map(file => (
         <div key={file.path} className="bg-slate-800 rounded-xl shadow p-4 border border-slate-600">
           <div className="flex justify-between items-center mb-2">
             <h2 className="font-bold text-white text-lg">📝 {file.label}</h2>
@@ -53,7 +52,7 @@ export default function FilePanel() {
           <textarea
             className="w-full h-48 bg-black text-green-300 font-mono p-2 rounded border border-slate-500"
             value={fileContents[file.path] || ""}
-            onChange={(e) => setFileContents(prev => ({ ...prev, [file.path]: e.target.value }))}
+            onChange={e => setFileContents(prev => ({ ...prev, [file.path]: e.target.value }))}
           />
         </div>
       ))}

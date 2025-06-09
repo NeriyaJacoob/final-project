@@ -15,7 +15,7 @@ from modules.utils import decrypt_key_rsa, log_summary
 from modules.encrypt import encrypt_files
 from modules.decrypt import decrypt_files
 from modules.sim_flow import run_simulation
-from modules.constants import BLOCK_FLAG
+from modules.constants import BLOCK_FLAG, DETECTION_FILE
 from modules.av_runner import start as start_av
 
 from flask import Flask, request, jsonify, send_file
@@ -53,17 +53,29 @@ from flask import Blueprint
 
 file_api = Blueprint("file_api", __name__)
 TMP_BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
+TARGET_BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "target"))
+
+ALIAS_DIRS = {
+    "/tmp/": TMP_BASE,
+    "/target/": TARGET_BASE,
+}
 
 # קריאת קובץ
 @app.route("/api/file", methods=["GET"])
 def read_file():
     path = request.args.get("path", "")
     
-    if not path.startswith("/tmp/"):
+    base_dir = None
+    relative = None
+    for prefix, real_base in ALIAS_DIRS.items():
+        if path.startswith(prefix):
+            base_dir = real_base
+            relative = path[len(prefix):]
+            break
+    if base_dir is None:
         return jsonify({"error": "Invalid path"}), 400
 
-    relative = path.replace("/tmp/", "")
-    real_path = os.path.join(BASE_DIR, "tmp", relative)
+    real_path = os.path.join(base_dir, relative)
 
     try:
         with open(real_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -80,10 +92,17 @@ def save_file():
     path = data.get("path", "")
     content = data.get("content", "")
 
-    if path.startswith("/tmp/"):
-        path = os.path.join(TMP_DIR, path.replace("/tmp/", ""))
-    else:
+    base_dir = None
+    relative = None
+    for prefix, real_base in ALIAS_DIRS.items():
+        if path.startswith(prefix):
+            base_dir = real_base
+            relative = path[len(prefix):]
+            break
+    if base_dir is None:
         return jsonify({"error": "Invalid path"}), 400
+
+    path = os.path.join(base_dir, relative)
 
     try:
         with open(path, "w", encoding="utf-8") as f:
@@ -91,6 +110,27 @@ def save_file():
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/target-files", methods=["GET"])
+def list_target_files():
+    """Return a list of editable target file paths."""
+    files = []
+
+    inf_dir = os.path.join(TMP_BASE, "TestInfected")
+    for root, _, names in os.walk(inf_dir):
+        for name in names:
+            rel = os.path.relpath(os.path.join(root, name), TMP_BASE)
+            files.append("/tmp/" + rel.replace(os.path.sep, "/"))
+
+    for root, _, names in os.walk(TARGET_BASE):
+        for name in names:
+            rel = os.path.relpath(os.path.join(root, name), TARGET_BASE)
+            files.append("/target/" + rel.replace(os.path.sep, "/"))
+
+    files.extend(["/tmp/block_ransom", "/tmp/detection_result.txt"])
+
+    return jsonify({"files": files})
 
 
 @app.route("/encrypt", methods=["POST"])
@@ -176,8 +216,11 @@ def get_logs():
 
 @app.route("/test-ransom", methods=["POST"])
 def test_ransom():
+    """Run the ransomware script and report if an antivirus blocked it."""
     try:
-        script = os.path.join(os.path.dirname(__file__), "modules", "simulation", "trigger_ransom.py")
+        script = os.path.join(
+            os.path.dirname(__file__), "modules", "simulation", "trigger_ransom.py"
+        )
         src_path = os.path.join(os.path.dirname(__file__))  # backend/src
 
         result = subprocess.run(
@@ -185,37 +228,36 @@ def test_ransom():
             cwd=os.path.dirname(script),
             env={**os.environ, "PYTHONPATH": src_path},
             capture_output=True,
-            text=True
+            text=True,
         )
 
-        if result.returncode == 2:
-            return jsonify({
-                "status": "blocked",
-                "message": "❌ הכופר נחסם על ידי אנטי וירוס",
-                "stdout": result.stdout,
-                "stderr": result.stderr
-            })
+        detected = os.path.exists(DETECTION_FILE)
+        blocked = os.path.exists(BLOCK_FLAG)
 
-        if result.returncode != 0:
-            return jsonify({
-                "status": "fail",
-                "message": "⚠️ שגיאה בהרצה",
-                "stdout": result.stdout,
-                "stderr": result.stderr
-            })
+        if blocked:
+            status = "blocked"
+            message = "❌ הכופר נחסם על ידי אנטי וירוס"
+        elif detected:
+            status = "fail"
+            message = "⚠️ זוהה אך לא נחסם"
+        elif result.returncode != 0:
+            status = "fail"
+            message = "⚠️ שגיאה בהרצה"
+        else:
+            status = "ok"
+            message = "💣 הכופר הורץ בהצלחה"
 
-        return jsonify({
-            "status": "ok",
-            "message": "💣 הכופר הורץ בהצלחה",
-            "stdout": result.stdout,
-            "stderr": result.stderr
-        })
+        return jsonify(
+            {
+                "status": status,
+                "message": message,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+            }
+        )
 
     except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/infection", methods=["POST"])
 def run_infection():
