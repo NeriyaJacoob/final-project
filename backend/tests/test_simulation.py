@@ -39,3 +39,19 @@ def test_test_ransom_reports_blocked_when_flag_set():
     assert data['status'] == 'blocked'
     assert os.path.exists(DETECTION_FILE)
     assert os.path.exists(BLOCK_FLAG)
+
+
+def test_simulate_decrypt_updates_stats(tmp_path):
+    clear_flags()
+    client = app.test_client()
+    resp = client.post('/simulate', json={'task': 'decrypt'})
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data['returncode'] == 0
+
+    stats_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src', 'modules', 'summary', 'stats.json'))
+    with open(stats_path, 'r', encoding='utf-8') as f:
+        stats = json.load(f)
+
+    assert stats['task_results']['decrypt']['detected'] is True
+    assert stats['task_results']['decrypt']['blocked'] is True

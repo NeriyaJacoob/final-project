@@ -74,6 +74,27 @@ def run_simulation(task: str):
         except Exception as e:
             stderr = str(e)
             ret = 1
+    elif task == "decrypt":
+        from modules.decrypt import decrypt_files
+        from modules.constants import TARGET_FOLDER
+        try:
+            decrypt_files(folder=TARGET_FOLDER)
+        except Exception as e:
+            stderr = str(e)
+            ret = 1
+        detected = True
+        blocked = True
+        logs.append({"time": time_now(), "msg": "בוצע פענוח קבצים"})
+        _update_stats(task, detected, blocked)
+        log_summary(f"[RESULT] סימולציית {task} הושלמה", "success" if ret == 0 else "fail")
+        return {
+            "detected": detected,
+            "blocked": blocked,
+            "stdout": stdout,
+            "stderr": stderr,
+            "returncode": ret,
+            "logs": logs,
+        }
     else:
         script = SIMULATION_SCRIPTS.get(task)
         if not script:
