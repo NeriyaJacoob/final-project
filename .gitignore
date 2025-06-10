@@ -1,0 +1,29 @@
+# ByteMe ransomware simulation
+
+# Node dependencies
+node_modules/
+frontend/node_modules/
+
+# Python environments
+venv/
+backend/venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Test and coverage artifacts
+.pytest_cache/
+coverage/
+
+# Build outputs
+frontend/build/
+dist/
+build/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db

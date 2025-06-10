@@ -1,0 +1,36 @@
+.ideContainer {
+  display: flex;
+  height: 500px;
+  border: 1px solid #555;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.ideTextarea {
+  width: 50%;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: monospace;
+  padding: 15px;
+  font-size: 16px;
+  border: none;
+  outline: none;
+}
+.ideOutput {
+  width: 50%;
+  background: #000;
+  color: #00ff88;
+  padding: 15px;
+  font-family: monospace;
+  font-size: 16px;
+}
+.ideRun {
+  margin-bottom: 10px;
+  color: #fff;
+}
+.ideRunButton {
+  background: #28a745;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

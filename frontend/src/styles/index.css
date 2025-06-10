@@ -1,0 +1,227 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================ */
+/* ✅ עיצוב מותאם אישי */
+/* ============================ */
+
+body, html {
+  background-color: #121212;
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  text-align: center;
+  padding-top: 60px;
+}
+
+header {
+  margin-bottom: 40px;
+}
+
+.highlight {
+  color: #ff1744;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.section {
+  text-align: center;
+  padding: 20px;
+}
+
+.btn {
+  width: 250px;
+  padding: 12px;
+  background-color: #1f1f1f;
+  color: #ffffff;
+  border: 2px solid #ff1744;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  background-color: #ff1744;
+  color: #ffffff;
+  transform: translateY(-3px);
+}
+
+.content {
+  margin-top: 50px;
+  font-size: 1.5rem;
+}
+
+.welcome {
+  color: #bbbbbb;
+}
+
+.quiz-option {
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: monospace;
+  text-align: right;
+}
+
+.quiz-option:hover {
+  background-color: #2a2a2a;
+}
+
+.quiz-option.selected {
+  border-color: #d62246;
+  background-color: #111;
+  color: #ff5577;
+}
+
+.diagram-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 40px;
+  gap: 20px;
+  direction: ltr;
+}
+
+.stage-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #1a1a1a;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(255, 0, 76, 0.5);
+  transition: transform 0.2s;
+}
+
+.stage-card:hover {
+  transform: scale(1.05);
+}
+
+.stage-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 10px;
+}
+
+.stage-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  color: white;
+}
+
+.stage-button {
+  background-color: transparent;
+  color: white;
+  border: 1px solid #ff005c;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.arrow-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.attack-methods {
+  margin-top: 2rem;
+  background-color: #111;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid #333;
+  color: #eee;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: right;
+  direction: rtl;
+}
+
+.attack-methods h3 {
+  color: #f43f5e;
+  margin-bottom: 1rem;
+}
+
+.attack-methods ul {
+  list-style-type: disc;
+  list-style-position: outside;
+  direction: rtl;
+  text-align: right;
+  padding-right: 2rem;
+  margin: 0;
+  line-height: 1.8;
+}
+
+.attack-methods .hint {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #f43f5e;
+}
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: left center;
+  }
+  50% {
+    background-position: right center;
+  }
+}
+
+.animate-gradient-x {
+  background-size: 200% 100%;
+  animation: gradient-x 10s ease-in-out infinite;
+}
+.theory-page {
+  @apply bg-blue-950 text-blue-100;
+}
+.simulation-page {
+  @apply bg-purple-950 text-purple-100;
+}
+.practice-page {
+  @apply bg-green-950 text-green-100;
+}
+.summary-page {
+  @apply bg-yellow-900 text-yellow-100;
+}
+.home-page {
+  @apply bg-pink-100 text-gray-800;
+}
+
+/* רקע לתפריט צד (אם רוצים גם אותו בצבע תואם) */
+.theory-page .sidebar {
+  @apply bg-blue-800 border-blue-600;
+}
+.simulation-page .sidebar {
+  @apply bg-purple-800 border-purple-600;
+}
+.practice-page .sidebar {
+  @apply bg-green-800 border-green-600;
+}
+.summary-page .sidebar {
+  @apply bg-yellow-800 border-yellow-600;
+}
+.home-page .sidebar {
+  @apply bg-red-800 border-red-600;
+}
+iframe {
+  background-color: transparent !important;
+}
