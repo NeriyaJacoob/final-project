@@ -30,6 +30,7 @@ app = Flask(__name__)
 CORS(app)
 start_av()
 
+
 @app.route("/progress/quiz", methods=["POST"])
 def update_quiz_score():
     data = request.get_json()
@@ -48,7 +49,8 @@ def update_quiz_score():
     with open(path, "w", encoding="utf-8") as f:
         json.dump(stats, f)
 
-    return jsonify({ "status": "ok" })
+    return jsonify({"status": "ok"})
+
 
 TMP_BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tmp"))
 TARGET_BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "target"))
@@ -58,25 +60,27 @@ ALIAS_DIRS = {
     "/target/": TARGET_BASE,
 }
 
+
+def _alias_to_real(path: str) -> str | None:
+    """Convert a web alias path to a real filesystem path."""
+    if path == "/tmp/detection_result.txt":
+        return DETECTION_FILE
+
+    for prefix, real_base in ALIAS_DIRS.items():
+        if path.startswith(prefix):
+            relative = path[len(prefix) :]
+            return os.path.join(real_base, relative)
+    return None
+
+
 # קריאת קובץ
 @app.route("/api/file", methods=["GET"])
 def read_file():
     path = request.args.get("path", "")
 
-    if path == "/tmp/detection_result.txt":
-        real_path = DETECTION_FILE
-    else:
-        base_dir = None
-        relative = None
-        for prefix, real_base in ALIAS_DIRS.items():
-            if path.startswith(prefix):
-                base_dir = real_base
-                relative = path[len(prefix):]
-                break
-        if base_dir is None:
-            return jsonify({"error": "Invalid path"}), 400
-
-        real_path = os.path.join(base_dir, relative)
+    real_path = _alias_to_real(path)
+    if real_path is None:
+        return jsonify({"error": "Invalid path"}), 400
 
     try:
         with open(real_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -92,13 +96,15 @@ def save_file():
     data = request.get_json()
     path = data.get("path", "")
     content = data.get("content", "")
-    
+
+    real_path = _alias_to_real(path)
+    if real_path is None:
+        return jsonify({"error": "Invalid path"}), 400
+
     print(f"[DEBUG] Saving to path: {path}")
-    print(f"[DEBUG] Content length: {len(content)}")
-    
-    # Your existing path resolution logic...
     print(f"[DEBUG] Resolved real_path: {real_path}")
-    
+    print(f"[DEBUG] Content length: {len(content)}")
+
     try:
         with open(real_path, "w", encoding="utf-8") as f:
             f.write(content)
@@ -107,6 +113,7 @@ def save_file():
     except Exception as e:
         print(f"[DEBUG] Error writing file: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/api/target-files", methods=["GET"])
 def list_target_files():
@@ -138,6 +145,7 @@ def encrypt_endpoint():
     encrypt_files(folder)
     return jsonify({"status": "encrypted", "folder": folder})
 
+
 @app.route("/decrypt", methods=["POST"])
 def decrypt_simulation():
     try:
@@ -146,6 +154,7 @@ def decrypt_simulation():
         return jsonify({"status": "ok", "message": "🔓 הקבצים פוענחו בהצלחה"})
     except Exception as e:
         return jsonify({"status": "fail", "message": f"שגיאה בפענוח: {str(e)}"})
+
 
 @app.route("/progress/theory", methods=["POST"])
 def update_theory_progress():
@@ -157,7 +166,7 @@ def update_theory_progress():
         with open(path, "r", encoding="utf-8") as f:
             progress = json.load(f)
     else:
-        progress = { "theory_pages": [] }
+        progress = {"theory_pages": []}
 
     if page not in progress["theory_pages"]:
         progress["theory_pages"].append(page)
@@ -171,6 +180,7 @@ def update_theory_progress():
 @app.route("/generate-key", methods=["GET"])
 def generate_key():
     import os
+
     key = os.urandom(32).hex()
     return jsonify({"key": key})
 
@@ -208,24 +218,32 @@ def get_logs():
     theory_percent = int((pages_read / total_pages) * 100)
     stats["theory_progress_percent"] = theory_percent
 
-    return jsonify({ "logs": content, "stats": stats })
+    return jsonify({"logs": content, "stats": stats})
+
 
 @app.route("/test-ransom", methods=["POST"])
 def test_ransom():
     """Run the ransomware script and report if an antivirus blocked it."""
     try:
-        script = os.path.join(
-            os.path.dirname(__file__), "modules", "simulation", "trigger_ransom.py"
-        )
-        src_path = os.path.join(os.path.dirname(__file__))  # backend/src
+        # If a student antivirus already signaled detection/blocking, skip running
+        # the simulation script to avoid deleting those flags.
+        pre_detected = os.path.exists(DETECTION_FILE)
+        pre_blocked = os.path.exists(BLOCK_FLAG)
 
-        result = subprocess.run(
-            ["python3", script],
-            cwd=os.path.dirname(script),
-            env={**os.environ, "PYTHONPATH": src_path},
-            capture_output=True,
-            text=True,
-        )
+        result = None
+        if not (pre_detected or pre_blocked):
+            script = os.path.join(
+                os.path.dirname(__file__), "modules", "simulation", "trigger_ransom.py"
+            )
+            src_path = os.path.join(os.path.dirname(__file__))  # backend/src
+
+            result = subprocess.run(
+                ["python3", script],
+                cwd=os.path.dirname(script),
+                env={**os.environ, "PYTHONPATH": src_path},
+                capture_output=True,
+                text=True,
+            )
 
         detected = os.path.exists(DETECTION_FILE)
         blocked = os.path.exists(BLOCK_FLAG)
@@ -236,7 +254,7 @@ def test_ransom():
         elif detected:
             status = "fail"
             message = "⚠️ זוהה אך לא נחסם"
-        elif result.returncode != 0:
+        elif result and result.returncode != 0:
             status = "fail"
             message = "⚠️ שגיאה בהרצה"
         else:
@@ -247,32 +265,38 @@ def test_ransom():
             {
                 "status": status,
                 "message": message,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
+                "stdout": result.stdout if result else "",
+                "stderr": result.stderr if result else "",
             }
         )
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
 @app.route("/infection", methods=["POST"])
 def run_infection():
     try:
         script = os.path.join(BASE_DIR, "modules", "infector.py")
-        result = subprocess.run(["python3", script], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(
+            ["python3", script], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
         print("[STDOUT]", result.stdout)
         print("[STDERR]", result.stderr)
-        return jsonify({"status": "✅ הדבקה הופעלה", "output": result.stdout, "error": result.stderr})
+        return jsonify(
+            {"status": "✅ הדבקה הופעלה", "output": result.stdout, "error": result.stderr}
+        )
     except Exception as e:
         return jsonify({"error": str(e)})
+
 
 @app.route("/antivirus/code", methods=["GET"])
 def read_student_code():
     path = os.path.abspath(os.path.join(BASE_DIR, "..", "tmp", "student_antivirus.py"))
-    default_code = f'''from modules.tools import kill_process
+    default_code = f"""from modules.tools import kill_process
 
     # דוגמה לשימוש: kill_process(1234)
-    print("✅ אנטי וירוס הופעל בהצלחה!")'''
+    print("✅ אנטי וירוס הופעל בהצלחה!")"""
     try:
         if not os.path.exists(path) or os.path.getsize(path) == 0:
             with open(path, "w") as f:
@@ -284,10 +308,11 @@ def read_student_code():
     except Exception as e:
         return f"# שגיאה בטעינת הקובץ: {e}"
 
+
 @app.route("/run-antivirus", methods=["POST"])
 def run_antivirus():
     try:
-        log_summary("[INFO] אנטי־וירוס הופעל ע\"י המשתמש", "system")
+        log_summary('[INFO] אנטי־וירוס הופעל ע"י המשתמש', "system")
 
         code_path = os.path.abspath(os.path.join(BASE_DIR, "..", "tmp", "student_antivirus.py"))
         print("📦 מריץ אנטי־וירוס מתוך:", code_path)
@@ -307,14 +332,9 @@ def run_antivirus():
         venv_path = os.path.join(BASE_DIR, "venv", "bin", "python")
         venv_python = venv_path if os.path.exists(venv_path) else sys.executable
 
-
         result = subprocess.run(
-            [venv_python, exec_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
+            [venv_python, exec_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
-
 
         stdout = result.stdout.strip()
         stderr = result.stderr.strip()
@@ -323,13 +343,11 @@ def run_antivirus():
         if stderr:
             log_summary(f"שגיאה בהרצת אנטי וירוס:\n{stderr}", "system")
 
-        return jsonify({
-            "result": stdout,
-            "error": stderr
-        })
+        return jsonify({"result": stdout, "error": stderr})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/antivirus/clear", methods=["POST"])
 def clear_antivirus_block():
@@ -341,6 +359,7 @@ def clear_antivirus_block():
         return jsonify({"status": "ok", "message": "לא היה אנטי וירוס פעיל"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
 
 @app.route("/save-antivirus", methods=["POST"])
 def save_antivirus():
@@ -362,8 +381,6 @@ def clear_summary_logs():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-
-
 @app.route("/simulate", methods=["POST"])
 def simulate():
     data = request.get_json()
@@ -375,10 +392,5 @@ def simulate():
         return jsonify({"error": str(e)}), 500
 
 
-
-
-
-
 if __name__ == "__main__":
     app.run(port=5000, debug=False)
-
