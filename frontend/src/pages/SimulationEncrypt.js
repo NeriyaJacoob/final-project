@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"; // Page demonstrating file encryption simulation.
 import { Link } from "react-router-dom";
 import "./styles/SimulationEncrypt.css";
 import MatrixBackground from "../components/MatrixBackground";

@@ -1,3 +1,5 @@
+"""Utility script that simulates a ransomware attack with a ransom note GUI."""
+
 import os, base64, subprocess, sys, shutil
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from modules.utils import log_summary

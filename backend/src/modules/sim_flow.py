@@ -1,3 +1,10 @@
+"""Simulation orchestration utilities used by the backend API.
+
+This module executes the various malware simulations (encryption,
+infection, etc.) and tracks their results. It also coordinates running
+the student's antivirus so they can test detection and blocking logic.
+"""
+
 import os
 import subprocess
 import sys
@@ -50,6 +57,14 @@ def _run_student_antivirus_once():
         )
 
 def run_simulation(task: str):
+    """Execute a simulation task and return its result details.
+
+    ``task`` should be one of ``encrypt``, ``decrypt``, ``infection`` or
+    ``ransom``. The appropriate script is executed and the student's
+    antivirus is invoked once so it has a chance to detect the activity.
+    The function returns a dictionary describing detection and blocking
+    status as well as captured output.
+    """
     for path in [DETECTION_FILE, BLOCK_FLAG, COUNTER_FILE]:
         try:
             if os.path.exists(path):
@@ -100,16 +115,17 @@ def run_simulation(task: str):
         if not script:
             raise ValueError(f"Unknown task: {task}")
 
+        # הרצת סקריפט הסימולציה כתהליך נפרד
         proc = subprocess.Popen(
             [sys.executable, script],
-            cwd=os.path.dirname(script),
+            cwd=os.path.dirname(script),  # הפעל מתוך תיקיית הסקריפט
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
 
         _run_student_antivirus_once()
-        time.sleep(1.0)
+        time.sleep(1.0)  # המתן שהאנטי־וירוס יסיים לרוץ
 
         if proc.poll() is None:
             stdout, stderr = proc.communicate()
@@ -131,6 +147,7 @@ def run_simulation(task: str):
     blocked_by_timeout = ret == -9  # SIGKILL או ערך המציין הריגה ע"י אנטי וירוס
 
     try:
+        # קרא את מונה החסימות הקודם
         with open(COUNTER_FILE, "r") as f:
             counter = int(f.read().strip())
     except:

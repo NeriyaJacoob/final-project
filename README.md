@@ -71,3 +71,6 @@ Simulation and antivirus logs are stored in `backend/src/modules/summary/log.txt
 Look for lines beginning with `[RESULT]` to see whether each scenario was
 detected and blocked successfully.
 
+Additional notes about the overall structure can be found in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+

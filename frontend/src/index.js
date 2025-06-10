@@ -1,4 +1,4 @@
-// index.js
+// Application bootstrap that mounts the React app to the DOM.
 import './styles/index.css';
 
 import React from 'react';

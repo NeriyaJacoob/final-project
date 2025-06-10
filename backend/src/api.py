@@ -1,3 +1,11 @@
+"""Flask REST API exposing the simulation and IDE endpoints.
+
+Each route in this file is documented in comments to help reviewers understand
+how the frontend communicates with the backend. This module also starts the
+background antivirus runner on import so the student's code executes
+periodically during simulations.
+"""
+
 import sys
 import os
 import subprocess

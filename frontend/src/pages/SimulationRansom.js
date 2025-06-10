@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"; // Page showing the ransom note simulation.
 import { Link } from "react-router-dom";
 import "./styles/SimulationRansom.css";
 import MatrixBackground from "../components/MatrixBackground";

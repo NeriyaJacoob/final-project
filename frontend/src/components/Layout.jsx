@@ -1,4 +1,5 @@
-import { useLocation, Link, Outlet } from "react-router-dom";
+// Top-level application layout with navigation sidebar and Matrix background.
+import { useLocation, Link, Outlet } from "react-router-dom"; // רכיבי ניווט מ-react-router
 import { Home, BookOpen, PlayCircle, ShieldCheck, BarChart3, FileText } from "lucide-react";
 import MatrixBackground from "../components/MatrixBackground";
 
@@ -9,11 +10,11 @@ const navItems = [
   { name: "תרגול", path: "/practice", icon: <ShieldCheck /> },
   { name: "סיכום", path: "/summary", icon: <BarChart3 /> },
   { name: "קבצים", path: "/Target_Files_Panel", icon: <FileText  /> },
-
+  // מערך ניווט לתפריט הצד
 ];
 
 export default function Layout() {
-  const { pathname } = useLocation();
+  const { pathname } = useLocation(); // מאפשר לדעת באיזו כתובת אנחנו
   const currentPath = pathname;
 
   let themeClass = "";
@@ -40,6 +41,7 @@ export default function Layout() {
         <aside className="w-64 p-5 space-y-4 shadow-xl border-r-4 text-white sidebar bg-black/20 backdrop-blur">
           <h1 className="text-3xl font-extrabold text-center mb-6 tracking-wide">ByteMe</h1>
           <nav className="space-y-2">
+            {/* יצירת קישורים מתוך מערך הניווט */}
             {navItems.map(({ name, path, icon }) => {
               const isActive = currentPath === path;
               return (

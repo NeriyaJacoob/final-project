@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; // Displays a vertical list of log entries.
 
 export default function Timeline({ logs = [] }) {
   return (

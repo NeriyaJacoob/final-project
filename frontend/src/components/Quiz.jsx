@@ -1,12 +1,14 @@
-import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react'; // ניהול מצב בחידון
+import { useNavigate } from "react-router-dom"; // ניווט בין עמודים
+
+// Multiple-choice quiz component used in the theory section.
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://127.0.0.1:5000";
 
 const Quiz = () => {
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [answers, setAnswers] = useState({}); // תשובות שנבחרו
+  const [submitted, setSubmitted] = useState(false); // האם החידון הוגש
 
   const questions = [
     {
@@ -127,6 +129,7 @@ const Quiz = () => {
           onClick={() => {
   setSubmitted(true);
 
+  // שלח את התוצאה לשרת לשמירה
   fetch(`${API_BASE}/progress/quiz`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
