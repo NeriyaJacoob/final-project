@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // React hooks לשמירת מצב
 import "./IDE.css";
+
+// Simple in-browser code editor used to run the student's antivirus script.
 
 const API_BASE = process.env.REACT_APP_API_BASE || "http://127.0.0.1:5000";
 
 export default function IDE() {
-  const [code, setCode] = useState("");
-  const [output, setOutput] = useState("");
+  const [code, setCode] = useState("");   // תוכן קובץ האנטי־וירוס
+  const [output, setOutput] = useState(""); // פלט ההרצה
 
   useEffect(() => {
-    fetch(`${API_BASE}/antivirus/code`)  // חדש
+    // טען את הקוד השמור מהשרת בעת הטעינה הראשונה
+    fetch(`${API_BASE}/antivirus/code`)
       .then(res => res.text())
       .then(text => setCode(text));
   }, []);
@@ -16,7 +19,7 @@ export default function IDE() {
  const runCode = async () => {
   try {
     // שלב 1: שמור את הקוד הנוכחי
-    await fetch(`${API_BASE}/save-antivirus`, {
+    await fetch(`${API_BASE}/save-antivirus`, {  // שלח לשרת לשמירה
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code })
@@ -24,7 +27,7 @@ export default function IDE() {
 
     // שלב 2: הרץ את הקובץ
     const res = await fetch(`${API_BASE}/run-antivirus`, {
-      method: "POST",
+      method: "POST",  // הרץ את הקובץ ששמרנו
     });
     const data = await res.json();
     setOutput(data.result || data.error || "אין פלט");
