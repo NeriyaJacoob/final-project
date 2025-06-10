@@ -28,3 +28,24 @@ def test_list_target_files():
     assert 'files' in data
     assert isinstance(data['files'], list)
     assert len(data['files']) > 0
+
+
+def test_save_file_updates_contents():
+    client = app.test_client()
+
+    sample_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'target', 'sample.txt'))
+
+    with open(sample_path, 'r', encoding='utf-8') as f:
+        original = f.read()
+
+    try:
+        resp = client.post('/api/file', json={'path': '/target/sample.txt', 'content': 'modified'})
+        assert resp.status_code == 200
+        assert resp.get_json()['status'] == 'success'
+
+        with open(sample_path, 'r', encoding='utf-8') as f:
+            assert f.read() == 'modified'
+    finally:
+        with open(sample_path, 'w', encoding='utf-8') as f:
+            f.write(original)
+

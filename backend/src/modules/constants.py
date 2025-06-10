@@ -1,7 +1,8 @@
 import os
 import tempfile
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# Base directory of the backend package
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 TMP_DIR = tempfile.gettempdir()
 DETECTION_FILE = os.path.join(TMP_DIR, "detection_result.txt")

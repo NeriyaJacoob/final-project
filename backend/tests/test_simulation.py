@@ -55,3 +55,24 @@ def test_simulate_decrypt_updates_stats(tmp_path):
 
     assert stats['task_results']['decrypt']['detected'] is True
     assert stats['task_results']['decrypt']['blocked'] is True
+
+
+def test_simulate_encrypt_changes_sample_file():
+    clear_flags()
+    client = app.test_client()
+
+    sample_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'target', 'sample.txt'))
+    with open(sample_path, 'rb') as f:
+        original = f.read()
+
+    try:
+        resp = client.post('/simulate', json={'task': 'encrypt'})
+        assert resp.status_code == 200
+
+        with open(sample_path, 'rb') as f:
+            assert f.read() != original
+    finally:
+        from modules.decrypt import decrypt_files
+        decrypt_files(os.path.dirname(sample_path))
+        with open(sample_path, 'wb') as f:
+            f.write(original)
