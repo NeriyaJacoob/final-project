@@ -1,3 +1,4 @@
+// Main React application router that wires all pages together.
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 

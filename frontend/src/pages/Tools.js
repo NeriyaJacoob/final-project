@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // Misc helper utilities for students.
 import { useNavigate } from "react-router-dom";
 import "./styles/Tools.css";
 

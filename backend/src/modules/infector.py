@@ -1,3 +1,5 @@
+"""Simulated infection flow for the "infection" scenario."""
+
 import os
 import subprocess
 import time
@@ -25,21 +27,24 @@ TARGET_EXTENSIONS = ['.py', '.sh']
 
 
 def clear_detection_log():
+    """Reset the detection marker file used by the simulation."""
     try:
-        open(DETECTION_FILE, "w").close()
+        open(DETECTION_FILE, "w").close()  # איפוס קובץ הזיהוי
     except:
         pass
 
 def was_detected():
+    """Return ``True`` if the infection marker file is non-empty."""
     try:
-        with open(DETECTION_FILE) as f:
+        with open(DETECTION_FILE) as f:  # קריאה מהירה של תוכן קובץ הזיהוי
             return bool(f.read().strip())
     except:
         return False
 
 def infect_file(filepath):
+    """Inject the trigger code into a Python or shell file."""
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r') as f:  # טען את הקובץ המקורי
             content = f.read()
 
         if INFECTION_MARKER in content:
@@ -48,16 +53,17 @@ def infect_file(filepath):
         if filepath.endswith('.sh') and not content.startswith("#!"):
             content = "#!/bin/bash\n" + content
 
-        with open(filepath, 'w') as f:
+        with open(filepath, 'w') as f:  # כתוב בחזרה עם קוד ההפעלה
             f.write(INJECTION_CODE + content)
 
-        os.chmod(filepath, 0o755)
+        os.chmod(filepath, 0o755)  # הפוך את הקובץ להרצה
         print(f"[+] Infected: {filepath}")
 
     except Exception as e:
         print(f"[-] Failed to infect {filepath}: {e}")
 
 def scan_and_infect(directory):
+    """Recursively infect files in ``directory`` with the trigger code."""
     for root, _, files in os.walk(directory):
         for filename in files:
             if any(filename.endswith(ext) for ext in TARGET_EXTENSIONS):
@@ -65,6 +71,7 @@ def scan_and_infect(directory):
                 infect_file(filepath)
 
 def run_infected_files(directory):
+    """Execute all infected files unless blocking flag exists."""
     if os.path.exists(BLOCK_FLAG):
         print("🔒 חסימה הופעלה – לא נריץ קבצים נגועים.")
         return
@@ -76,17 +83,18 @@ def run_infected_files(directory):
                 print(f"[>] Executing: {filepath}")
                 try:
                     if filename.endswith('.sh'):
-                        subprocess.run([filepath])
+                        subprocess.run([filepath])  # הרצת סקריפט shell נגוע
                     elif filename.endswith('.py'):
-                        subprocess.run(['python3', filepath])
+                        subprocess.run(['python3', filepath])  # הרצת קובץ Python נגוע
                 except Exception as e:
                     print(f"[!] Failed to execute {filename}: {e}")
 
 def run_student_antivirus():
+    """Run the student's antivirus script once."""
     path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "tmp", "student_antivirus.py")
     )
-    subprocess.run(["python3", path])
+    subprocess.run(["python3", path])  # הרץ את קובץ האנטי־וירוס פעם אחת
 
 if __name__ == "__main__":
     log_summary("[SYSTEM] סימולציית infection הופעלה", "system")

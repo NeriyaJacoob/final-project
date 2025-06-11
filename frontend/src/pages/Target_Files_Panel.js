@@ -1,3 +1,4 @@
+// Editor page for browsing and modifying target files used in simulations.
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
