@@ -12,7 +12,9 @@ const SimulationEncrypt = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Pass a web alias path so the backend can resolve the real location.
-        body: JSON.stringify({ folder: "/target/sample.txt" })
+        // Encrypt the entire target folder so the simulation modifies
+        // sample.txt and any other demo files under /target.
+        body: JSON.stringify({ folder: "/target" })
       });
       const data = await res.json();
       alert(`✅ הוצפן: ${data.folder}`);
