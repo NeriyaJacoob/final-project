@@ -1,0 +1,12 @@
+[SYSTEM] ⚠️ התחלת סימולציה חדשה
+[FAIL] 🔴 הכופר הצפין את הקבצים בתיקייה
+[SYSTEM] ⚠️ התחלת סימולציה חדשה
+[FAIL] 🔴 הכופר הצפין את הקבצים בתיקייה
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[FAIL] 🔴 [FAIL] לא זוהתה הדבקה בזמן בסימולציית infection
+[FAIL] 🔴 [RESULT] סימולציית infection לא זוהתה
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[SYSTEM] ⚠️ [SYSTEM] סימולציית infection הופעלה
+[FAIL] 🔴 [FAIL] לא זוהתה הדבקה בזמן בסימולציית infection
+[FAIL] 🔴 [RESULT] סימולציית infection לא זוהתה

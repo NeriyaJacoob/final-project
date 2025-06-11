@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text {
+      font-family: monospace;
+      font-size: 16px;
+      fill: #00ffcc;
+      opacity: 0.1;
+    }
+  </style>
+  <text x="10" y="20">0100101101</text>
+  <text x="60" y="40">1010101010</text>
+  <text x="110" y="60">1100110011</text>
+  <text x="10" y="100">1001100110</text>
+  <text x="60" y="140">0110101010</text>
+  <text x="110" y="180">0101010101</text>
+  <text x="20" y="70">0110</text>
+  <text x="80" y="120">1001</text>
+  <text x="150" y="30">01101100</text>
+  <text x="30" y="170">101101</text>
+</svg>
