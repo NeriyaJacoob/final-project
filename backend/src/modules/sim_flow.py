@@ -89,6 +89,9 @@ def run_simulation(task: str):
         except Exception as e:
             stderr = str(e)
             ret = 1
+        # Run the student's antivirus once so it can detect the encrypted file
+        _run_student_antivirus_once()
+        time.sleep(1.0)
     elif task == "decrypt":
         from modules.decrypt import decrypt_files
         from modules.constants import TARGET_FOLDER
