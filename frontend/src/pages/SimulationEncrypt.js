@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"; // Page demonstrating file encryption simulation.
 import { Link } from "react-router-dom";
 import "./styles/SimulationEncrypt.css";
 import MatrixBackground from "../components/MatrixBackground";
@@ -11,7 +11,10 @@ const SimulationEncrypt = () => {
       const res = await fetch(`${API_BASE}/encrypt`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folder: "tmp/sample.txt" })
+        // Pass a web alias path so the backend can resolve the real location.
+        // Encrypt the entire target folder so the simulation modifies
+        // sample.txt and any other demo files under /target.
+        body: JSON.stringify({ folder: "/target" })
       });
       const data = await res.json();
       alert(`✅ הוצפן: ${data.folder}`);

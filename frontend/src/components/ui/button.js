@@ -1,3 +1,4 @@
+// Reusable styled button used throughout the UI.
 export function Button({ children, onClick, className = '', type = 'button' }) {
   return (
     <button

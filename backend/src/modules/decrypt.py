@@ -1,3 +1,10 @@
+"""Decryption helper matching :mod:`encrypt`.
+
+Reads files written by ``encrypt_files`` and restores the original
+content. This is used by the simulation to clean up after the ransomware
+run so students can repeat the exercise.
+"""
+
 import os
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
@@ -11,23 +18,32 @@ SIGNATURE = b"BME1"
 CHUNK_SIZE = 10 * 1024
 
 def decrypt_files(folder: str = TARGET_FOLDER):
-    for root, _, files in os.walk(folder):
+    """Reverse the operation performed by :func:`encrypt_files`.
+
+    Walks over ``folder`` and decrypts files that start with
+    ``SIGNATURE``. Any errors are logged so the simulation can continue
+    even if individual files fail to decrypt.
+    """
+    for root, _, files in os.walk(folder):  # מעבר על הקבצים שהוצפנו
         for name in files:
+            # בניית הנתיב המלא לקובץ
             path = os.path.join(root, name)
             try:
+                # קריאה בינארית של הקובץ המוצפן
                 with open(path, "rb") as f:
                     data = f.read()
 
                 if not data.startswith(SIGNATURE):
                     continue
 
-                iv = data[4:20]
+                iv = data[4:20]  # וקטור האתחול ששמור בקובץ
                 encrypted_header = data[20:20 + ((CHUNK_SIZE + AES.block_size - 1)//AES.block_size)*AES.block_size]
-                tail = data[20 + len(encrypted_header):]
+                tail = data[20 + len(encrypted_header):]  # שאר תוכן הקובץ
 
-                cipher = AES.new(KEY, AES.MODE_CBC, iv)
-                header = unpad(cipher.decrypt(encrypted_header), AES.block_size)
+                cipher = AES.new(KEY, AES.MODE_CBC, iv)  # בניית אובייקט הצופן
+                header = unpad(cipher.decrypt(encrypted_header), AES.block_size)  # פענוח הכותרת המקורית
 
+                # כתיבת הקובץ המקורי חזרה
                 with open(path, "wb") as f:
                     f.write(header + tail)
 

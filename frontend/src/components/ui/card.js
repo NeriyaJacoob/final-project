@@ -1,3 +1,4 @@
+// Basic card container with optional content area.
 export function Card({ children, className = '' }) {
   return <div className={`rounded-lg shadow bg-gray-700 ${className}`}>{children}</div>;
 }

@@ -71,3 +71,16 @@ Simulation and antivirus logs are stored in `backend/src/modules/summary/log.txt
 Look for lines beginning with `[RESULT]` to see whether each scenario was
 detected and blocked successfully.
 
+## Troubleshooting
+If the encryption simulation fails to run, verify that all Python packages are
+installed. Run `./setup_env.sh` or manually install `requirements.txt` to ensure
+the `Crypto` module is available. Missing dependencies can prevent the backend
+from encrypting files and thus stop the antiviruses from detecting activity.
+
+If you imported the project on a fresh virtual machine, also check that you have
+permission to write into the `backend/target` and `/tmp` folders used during
+simulations.
+
+Additional notes about the overall structure can be found in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+

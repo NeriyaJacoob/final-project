@@ -1,3 +1,11 @@
+"""Flask REST API exposing the simulation and IDE endpoints.
+
+Each route in this file is documented in comments to help reviewers understand
+how the frontend communicates with the backend. This module also starts the
+background antivirus runner on import so the student's code executes
+periodically during simulations.
+"""
+
 import sys
 import os
 import subprocess
@@ -138,11 +146,27 @@ def list_target_files():
 
 @app.route("/encrypt", methods=["POST"])
 def encrypt_endpoint():
-    folder = request.json.get("folder")
+    """Encrypt files in the requested folder and trigger the antivirus once."""
+    folder = request.json.get("folder", "")
     if not folder:
         return jsonify({"error": "Missing folder"}), 400
 
-    encrypt_files(folder)
+    # Support paths like "tmp/sample.txt" coming from the frontend by resolving
+    # them to real filesystem locations.  Paths that don't match our aliases are
+    # used as-is so existing behaviour remains compatible.
+    if not folder.startswith("/"):
+        folder = "/" + folder
+    real_path = _alias_to_real(folder) or folder
+
+    # Give the antivirus a chance to run prior to encrypting files so it can
+    # capture the original state.
+    _run_student_antivirus_once()
+
+    encrypt_files(real_path)
+    # Run the student's antivirus script again to detect the encrypted file
+    # before the UI attempts to display the ransom note.
+    _run_student_antivirus_once()
+
     return jsonify({"status": "encrypted", "folder": folder})
 
 
