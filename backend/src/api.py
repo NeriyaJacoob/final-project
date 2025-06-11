@@ -146,11 +146,23 @@ def list_target_files():
 
 @app.route("/encrypt", methods=["POST"])
 def encrypt_endpoint():
-    folder = request.json.get("folder")
+    """Encrypt files in the requested folder and trigger the antivirus once."""
+    folder = request.json.get("folder", "")
     if not folder:
         return jsonify({"error": "Missing folder"}), 400
 
-    encrypt_files(folder)
+    # Support paths like "tmp/sample.txt" coming from the frontend by resolving
+    # them to real filesystem locations.  Paths that don't match our aliases are
+    # used as-is so existing behaviour remains compatible.
+    if not folder.startswith("/"):
+        folder = "/" + folder
+    real_path = _alias_to_real(folder) or folder
+
+    encrypt_files(real_path)
+    # Run the student's antivirus script a single time so it can detect the
+    # encrypted file before the UI attempts to display the ransom note.
+    _run_student_antivirus_once()
+
     return jsonify({"status": "encrypted", "folder": folder})
 
 
